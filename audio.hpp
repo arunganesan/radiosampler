@@ -30,4 +30,10 @@ public:
   int getNumGroundTruth ();
   Sample getSample (int);
   Sample getGroundTruthAround (int, int);
+
+
+  // Debugging functions
+  void saveSamples ();
+  void testCropping (int, int);
+  void plotSamples (vector<Sample> &) {}
 };

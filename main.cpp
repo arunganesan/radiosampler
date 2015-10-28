@@ -24,5 +24,9 @@ int main () {
   AudioManager am;
   am.loadSamples("sampled-repos/car-clean-10.26.2015/");
   am.loadGroundTruth("audio-repos/car-clean-10.26.2015/");
+  
+  //am.saveSamples();
+  am.testCropping(5, 2);
+  
   return 0;
 }

@@ -58,7 +58,8 @@ void AudioManager::loadSamples (string dirname) {
     sregex re = sregex::compile(".*/(\\d+)-\\w+-(\\d+\\.\\d).m4a.wav");
     regex_match(filename, what, re);
     it->station = what[2];
-    it->offset = stoi(what[1]);
+    double seconds_offset = stod(what[1])/1000;
+    it->offset = int(seconds_offset*FS);
     cout << "Loaded " << it->filename << " station " << it->station << " offset " << it->offset << endl;
   }
 }
@@ -87,20 +88,13 @@ void AudioManager::loadGroundTruth (string dirname) {
 
 int AudioManager::evaluate (string matches []) { return 1; }
 
-int AudioManager::getNumSamples () { 
-  return this->samples.size();  
-}
-
-int AudioManager::getNumGroundTruth () {
-  return this->groundTruth.size();
-}
+int AudioManager::getNumSamples () { return this->samples.size(); }
+int AudioManager::getNumGroundTruth () { return this->groundTruth.size(); }
 
 Sample AudioManager::getSample (int id) {
   assert (id < this->samples.size());
   return this->samples.at(id);
 }
-
-
 
 /**
 Makes a new sample and simply offsets the pointer 
@@ -116,12 +110,70 @@ Sample AudioManager::getGroundTruthAround (int sampleId, int gtId) {
 
   Sample sample = this->samples[sampleId];
   Sample gt = this->groundTruth[gtId];
-
+  
+  cout << "Cropping ground truth " << gt.filename << " around sample " << sample.filename <<endl;
+  
   int x0 = max(0, sample.offset - WINDOW);
   int x1 = min(gt.length-1, sample.offset + sample.length + WINDOW);
-
+  
+  // XXX: Who frees this memory?
   Sample * subset = new Sample(gt);
   subset->audio += x0;
   subset->length = x1 - x0;
   return *subset;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ ____       _                       _             
+ |  _ \  ___| |__  _   _  __ _  __ _(_)_ __   __ _ 
+ | | | |/ _ \ '_ \| | | |/ _` |/ _` | | '_ \ / _` |
+ | |_| |  __/ |_) | |_| | (_| | (_| | | | | | (_| |
+ |____/ \___|_.__/ \__,_|\__, |\__, |_|_| |_|\__, |
+                         |___/ |___/         |___/ 
+*/
+
+void AudioManager::saveSamples () {
+  SF_INFO sfinfo;
+  sfinfo.channels = 1;
+  sfinfo.samplerate = FS;
+  sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+  
+  for (vector<Sample>::iterator it = samples.begin(); it != samples.end(); ++it) {
+    string file = "output/" + to_string(it->offset) + "-" + it->station + ".wav";
+    cout << "Saving " << file << endl;
+    SndfileHandle ofile = SndfileHandle(file, SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_PCM_16, 1, 8000);
+    ofile.write(it->audio, it->length);
+    //sf_write_sync(ofile);
+    //sf_close(ofile);
+  }
+}
+
+
+void AudioManager::testCropping (int sId, int gId) {
+  Sample cropped = getGroundTruthAround(sId, gId);
+  SF_INFO sfinfo;
+  sfinfo.channels = 1;
+  sfinfo.samplerate = FS;
+  sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
+  
+  string file = "output/cropped.wav";
+  cout << "Saving " << file << endl;
+  SndfileHandle ofile = SndfileHandle(file, SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_PCM_16, 1, 8000);
+  ofile.write(cropped.audio, cropped.length);
+
+}
+
