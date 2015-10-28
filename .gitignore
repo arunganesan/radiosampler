@@ -1,4 +1,7 @@
 *.o
+*.swp
+.*swp
+main
 sampled-repos
 sampled-repos/*
 audio-repos

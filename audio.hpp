@@ -15,6 +15,9 @@ class AudioManager {
   vector<Sample> groundTruth;
   const int FS = 8000;
   const int WINDOW = 2*FS;
+
+  void loadFiles (string, vector<Sample> &);
+
 public:
   // Called by main to initialize audio manager 
   AudioManager();

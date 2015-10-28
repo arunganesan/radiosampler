@@ -23,5 +23,6 @@ void list_all_files () {
 int main () {
   AudioManager am;
   am.loadSamples("sampled-repos/car-clean-10.26.2015/");
+  am.loadGroundTruth("audio-repos/car-clean-10.26.2015/");
   return 0;
 }

@@ -15,13 +15,11 @@ using namespace xpressive;
 AudioManager::AudioManager () {}
 
 /**
-Loads the wave files from the directory.
+General loading function.
 
-Assumes the files are named in a particular format.
-
-It extracts the offset, station name and everything needed.
+This is used by the both the load Samples and load Groundtruth
 */
-void AudioManager::loadSamples (string dirname) {
+void AudioManager::loadFiles (string dirname, vector<Sample> &into) {
   vector<string> filenames = list_all_files(dirname); 
   for (vector<string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
     string filename = *it;
@@ -34,17 +32,34 @@ void AudioManager::loadSamples (string dirname) {
     double * signal = new double [ff.frames()];
     ff.read(signal, ff.frames());
     
-    smatch what;
-    sregex re = sregex::compile(".*/(\\d+)-\\w+-(\\d+\\.\\d).m4a.wav");
-    regex_match(filename, what, re);
-    
-    sample.station = what[2];
-    sample.offset = stoi(what[1]);
+    sample.station = "";
+    sample.offset = 0;
     sample.filename = filename;
     sample.audio = signal;
     sample.length = ff.frames();
-    this->samples.push_back(sample);
-    cout << "Loaded " << sample.filename << " station " << sample.station << " offset " << sample.offset << endl;
+    into.push_back(sample);
+  }
+}
+
+
+/**
+Loads the wave files from the directory.
+
+Assumes the files are named in a particular format.
+
+It extracts the offset, station name and everything needed.
+*/
+void AudioManager::loadSamples (string dirname) {
+  loadFiles(dirname, samples);
+  for (vector<Sample>::iterator it = samples.begin(); it != samples.end(); ++it) {
+    string filename = it->filename;
+    
+    smatch what;
+    sregex re = sregex::compile(".*/(\\d+)-\\w+-(\\d+\\.\\d).m4a.wav");
+    regex_match(filename, what, re);
+    it->station = what[2];
+    it->offset = stoi(what[1]);
+    cout << "Loaded " << it->filename << " station " << it->station << " offset " << it->offset << endl;
   }
 }
 
@@ -55,29 +70,17 @@ Uses filename as the ground truth station.
 The offset is set to 0 but is never used.
 */
 void AudioManager::loadGroundTruth (string dirname) {
-  vector<string> filenames = list_all_files(dirname); 
-  for (vector<string>::iterator it = filenames.begin(); it != filenames.end(); ++it) {
-    string filename = *it;
-    if (filename.find(".wav") == string::npos) continue;
-    
-    Sample sample;
-    SndfileHandle ff = SndfileHandle(filename);
-    assert(ff.channels() == 1);
-    assert(ff.samplerate() == 8000);
-    double * signal = new double [ff.frames()];
-    ff.read(signal, ff.frames());
+  loadFiles(dirname, groundTruth);
+  for (vector<Sample>::iterator it = groundTruth.begin(); it != groundTruth.end(); ++it) {
+    string filename = it->filename;
     
     smatch what;
     sregex re = sregex::compile(".*/(\\d+\\.\\d).wav");
     regex_match(filename, what, re);
     
-    sample.station = what[1];
-    sample.offset = 0;
-    sample.filename = filename;
-    sample.audio = signal;
-    sample.length = ff.frames();
-    this->samples.push_back(sample);
-    cout << "Loaded " << sample.filename << " station " << sample.station << " offset " << sample.offset << endl;
+    it->station = what[1];
+    it->offset = 0;
+    cout << "Loaded " << it->filename << " station " << it->station << " offset " << it->offset << endl;
   }
 }
 
