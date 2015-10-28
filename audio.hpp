@@ -1,3 +1,6 @@
+#ifndef _AUDIO_INCL
+#define _AUDIO_INCL
+
 #include <sndfile.hh>
 #include <vector>
 using namespace std;
@@ -37,3 +40,5 @@ public:
   void testCropping (int, int);
   void plotSamples (vector<Sample> &) {}
 };
+
+#endif

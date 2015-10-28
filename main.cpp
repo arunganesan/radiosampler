@@ -3,6 +3,7 @@
 #include <boost/filesystem.hpp>
 
 #include "audio.hpp"
+#include "identification.hpp"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -21,12 +22,10 @@ void list_all_files () {
 
 
 int main () {
-  AudioManager am;
-  am.loadSamples("sampled-repos/car-clean-10.26.2015/");
-  am.loadGroundTruth("audio-repos/car-clean-10.26.2015/");
-  
-  //am.saveSamples();
-  am.testCropping(5, 2);
-  
+  AudioManager * am = new AudioManager();
+  am->loadSamples("sampled-repos/car-clean-10.26.2015/");
+  am->loadGroundTruth("audio-repos/car-clean-10.26.2015/");
+  Identifier id = Identifier(am);
+  //Identifier identifiers [2] = {XCorrIdentifier(am), RandomIdentifier(am)};
   return 0;
 }
