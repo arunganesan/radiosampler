@@ -1,3 +1,4 @@
+*.o
 sampled-repos
 sampled-repos/*
 audio-repos
