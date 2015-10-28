@@ -13,7 +13,8 @@ struct Sample {
 class AudioManager {
   vector<Sample> samples;
   vector<Sample> groundTruth;
-  
+  const int FS = 8000;
+  const int WINDOW = 2*FS;
 public:
   // Called by main to initialize audio manager 
   AudioManager();

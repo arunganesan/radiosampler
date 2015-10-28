@@ -1,4 +1,4 @@
-CC = g++-4.9
+CC = g++
 
 default: audio.o utils.o
 	$(CC) main.cpp -std=gnu++11 -o main.o utils.o audio.o -lsndfile -lboost_system -lboost_filesystem
