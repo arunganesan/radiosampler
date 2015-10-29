@@ -25,7 +25,10 @@ int main () {
   AudioManager * am = new AudioManager();
   am->loadSamples("sampled-repos/car-clean-10.26.2015/");
   am->loadGroundTruth("audio-repos/car-clean-10.26.2015/");
-  Identifier id = Identifier(am);
+  XCorrIdentifier * xc = new XCorrIdentifier(am);
+  xc->doAllMatches();
+  int correct = am->evaluate(xc->getMatches());
+  cout << "Got " << correct << " out of " << am->getNumSamples() << endl;
   //Identifier identifiers [2] = {XCorrIdentifier(am), RandomIdentifier(am)};
   return 0;
 }

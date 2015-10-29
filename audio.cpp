@@ -86,8 +86,6 @@ void AudioManager::loadGroundTruth (string dirname) {
 }
 
 
-int AudioManager::evaluate (string matches []) { return 1; }
-
 int AudioManager::getNumSamples () { return this->samples.size(); }
 int AudioManager::getNumGroundTruth () { return this->groundTruth.size(); }
 
@@ -127,8 +125,24 @@ Sample AudioManager::getGroundTruthAround (int sampleId, int gtId) {
 
 
 
+/**
+Assumes the matches pointer is to an array that has 
+exactly numSamples elements.
 
+It compares the ground truth  
+*/
+int AudioManager::evaluate (int * matches) {
+  int correct = 0;
+  int total = getNumSamples();
 
+  for (int sid = 0; sid < getNumSamples(); sid++) {
+    int guess = matches[sid];
+    if (groundTruth[guess].station == samples[sid].station)
+      correct ++;
+  }
+
+  return correct;
+}
 
 
 

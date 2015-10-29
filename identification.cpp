@@ -44,20 +44,3 @@ void Identifier::doAllMatches () {
 
 
 
-
-class XCorrIdentifier : public Identifier {
-  double calculateMatch (int sid, int gid) {
-    // We want to xcorr the SID with the GID
-    // And return the sum or the max value
-    return 0;
-  }
-};
-
-
-class RandomIdentifier : public Identifier {
-  double calculateMatch (int sid, int gid) { 
-    srand(time(NULL));
-    int guess = rand() % am->getNumGroundTruth();
-    return guess;
-  }
-};

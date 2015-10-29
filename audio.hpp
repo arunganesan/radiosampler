@@ -26,7 +26,7 @@ public:
   AudioManager();
   void loadSamples (string);
   void loadGroundTruth (string);
-  int evaluate (string []);
+  int evaluate (int *);
   
   // Called by the individual algorithms 
   int getNumSamples ();
